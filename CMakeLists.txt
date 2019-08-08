@@ -3,4 +3,4 @@ project(server C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(server daemon.c server.c server.h operation.c func.h)
+add_executable(server daemon.c server.c server.h operation.c stringbuffer.c stringbuffer.h)

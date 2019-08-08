@@ -1,6 +1,12 @@
-//
-// Created by charname on 7/9/19.
-//
+/*
+ ============================================================================
+ Name        : Simple Remote Execution System Linux server
+ Author      : Alex
+ Version     : 0.9v
+ Copyright   : No copyright
+ Description : 2803ICT assignment 1, Ansi-style, CLion + Ubuntu
+ ============================================================================
+ */
 
 #ifndef SERVER_SERVER_H
 #define SERVER_SERVER_H
@@ -20,9 +26,14 @@
 #include <sys/wait.h>
 
 #define DEFAULTPORT  1024
+#define STDBUF 1024
 
 typedef unsigned int SOCKET;
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
+
+int initSock();
+int recvMsg(SOCKET sockFd, char* msg);
+int sendMsg(SOCKET sockFd, char* msg);
 
 #endif //SERVER_SERVER_H
