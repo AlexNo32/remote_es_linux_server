@@ -25,6 +25,8 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+#include "stringbuffer.h"
+
 #define DEFAULTPORT  1024
 #define STDBUF 1024
 
@@ -33,7 +35,8 @@ typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
 
 int initSock();
-int recvMsg(SOCKET sockFd, char* msg);
-int sendMsg(SOCKET sockFd, char* msg);
+int clientHandle(SOCKET sock);
+int recvMsg(SOCKET sockFd, Vector *vector);
+int sendMsg(SOCKET sockFd, Vector *vector);
 
 #endif //SERVER_SERVER_H

@@ -1,6 +1,12 @@
-//
-// Created by charname on 7/23/19.
-//
+/*
+ ============================================================================
+ Name        : Simple Remote Execution System Linux server
+ Author      : Alex
+ Version     : 0.9v
+ Copyright   : No copyright
+ Description : 2803ICT assignment 1, Ansi-style, CLion + Ubuntu
+ ============================================================================
+ */
 
 #ifndef STRINGBUFFERTEST_STRINGBUFFER_H
 #define STRINGBUFFERTEST_STRINGBUFFER_H

@@ -1,62 +1,47 @@
-//
-// Created by charname on 7/9/19.
-//
+/*
+ ============================================================================
+ Name        : Simple Remote Execution System Linux server
+ Author      : Alex
+ Version     : 0.9v
+ Copyright   : No copyright
+ Description : 2803ICT assignment 1, Ansi-style, CLion + Ubuntu
+ ============================================================================
+ */
 #include "server.h"
 
 /* Request handling */
-int clientHandle(SOCKET sock) {
+int clientHandle(SOCKET sockFd) {
     int loop = 1;
-/**
+
     // keep recving message form one client until receive 'quit'
     while (loop) {
-        char buffer[PACKAGESIZE] = { 0 };
-        int offset = 0, rCode = 0;
-        unsigned long timeStamp = 0;
-        int i;
+        Vector vector;
+        vector_init(&vector);
 
-        // recv data
-        if (recv(sock, buffer, PACKAGESIZE, 0) < 0) {
-            printf("[Error] Lost connection. \n");
-            loop = 0;
-            //return ERROR;
-        }
-        // get command code
-        offset += USINT - 1;
+        recvMsg(sockFd, &vector);
 
-        for (i = 0; i < offset; i++)
-            rCode = rCode * 10 + (buffer[i] - '0');
+        printf("Receive from client: %s\n", vector.data);
+//        char buffer[PACKAGESIZE] = { 0 };
+//        int offset = 0, rCode = 0;
+//        unsigned long timeStamp = 0;
+//        int i;
 
+//        // recv data
+//        if (recv(sock, buffer, PACKAGESIZE, 0) < 0) {
+//            printf("[Error] Lost connection. \n");
+//            loop = 0;
+//        }
 
-        offset += TIMESTAMP;
-        for (i = 2; i < offset; i++)
-            timeStamp = timeStamp * 10 + (buffer[i] - '0');
-
-        switch (rCode) {
-            case N_PUT:
-                sPut(sock, timeStamp, buffer + offset); break;
-
-            case N_GET:
-                sGet(sock, timeStamp, buffer + offset); break;
-
-            case N_RUN:
-                sRun(sock, timeStamp, buffer + offset); break;
-
-            case N_LIST:
-                sList(sock, timeStamp, buffer + offset); break;
-
-            case N_SYS:
-                sSys(sock, timeStamp); break;
-
-            case N_QUIT:
-                sQuit(sock);
-                loop = 0;
-                break;
-
-            default:
-                break;
-        }
 
     }
-*/
+    close(sockFd);
+    return 0;
+}
+
+int recvRequest(){
+    return 0;
+}
+
+int sendResponse(){
     return 0;
 }

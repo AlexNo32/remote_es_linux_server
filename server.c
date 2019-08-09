@@ -98,28 +98,27 @@ void clientHandler(SOCKET sock) {
         printf("[INFO] New client [ %d ] is connected. \n", clientFd);
 
         pid = fork();
-        if(pid == -1){
-            perror("[ERROR] fork create failed:");
-            continue;
+
+        switch(pid){
+            case -1: perror("[ERROR] fork create failed:"); break;
+
+            case  0: clientHandle(clientFd); return; // request handling
+
+            default: close(clientFd);
         }
+//    return;
 
-        // child process
-        if (pid == 0) {
-            // request handling
-            //clientHandle(clientFd);
-            // DEBUG
-            //while(1){
-                // 1. receive msg
-                // 2. return msg
-           // }
-
-
-            close(clientFd);
-            return;
-        }
-            //parents process
-        else
-            close(clientFd);
+//        if(pid == -1){
+//            perror("[ERROR] fork create failed:");
+//            continue;
+//        }
+//
+//        if (pid == 0) {  // child process
+//            clientHandle(clientFd);  // request handling
+//            return;
+//        }
+//        else //parents process
+//            close(clientFd);
     }
 }
 
@@ -132,20 +131,19 @@ void sigChld(int signo){
     return;
 }
 
-
-int recvMsg(SOCKET sockFd, char *msg){
+int recvMsg(SOCKET sockFd, Vector *vector){
     int nCount;
     char buff[STDBUF];
 
     while( (nCount = recv(sockFd, buff, STDBUF, MSG_WAITALL)) > 0 ){
-        //fwrite(buffer, nCount, 1, fp);
+        vector_append(vector, buff, nCount);
     }
     // nbytes = recv(sockFd, buff, buff_size,MSG_WAITALL);
     return 0;
 }
 
-int sendMsg(SOCKET sockFd, char* msg){
-    if(send(sockFd, msg, strlen(msg), MSG_WAITALL) == -1){
+int sendMsg(SOCKET sockFd, Vector *vector){
+    if(send(sockFd, vector->data, strlen(vector->size), MSG_WAITALL) == -1){
         perror("[ERROR] send failed ");
         return -1;
     }
