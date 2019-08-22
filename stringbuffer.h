@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : Simple Remote Execution System Linux server
+ Name        : Simple Remote Execution System Linux client
  Author      : Alex
  Version     : 0.9v
  Copyright   : No copyright
@@ -11,24 +11,22 @@
 #ifndef STRINGBUFFERTEST_STRINGBUFFER_H
 #define STRINGBUFFERTEST_STRINGBUFFER_H
 
-#define VECTOR_INITIAL_CAPACITY 1024
+#define BUFFER_INITIAL_CAPACITY 1024
 
 typedef struct {
     int size;      // slots used so far
     int capacity;  // total available slots
     char *data;     // array of integers we're storing
-} Vector;
+} Buffer;
 
-void vector_init(Vector *vector);
+void buffer_init(Buffer *buffer);
 
-void vector_append(Vector *vector, char* value, size_t nCount);
+void buffer_append(Buffer *buffer, char* value, size_t nCount);
 
-int vector_get(Vector *vector, int index);
+void buffer_append_short(Buffer *buf, int value);
 
-//void vector_set(Vector *vector, int index, int value);
+void buffer_append_timestamp(Buffer *buf, long long value);
 
-//void vector_double_capacity_if_full(Vector *vector);
-
-void vector_free(Vector *vector);
+void buffer_free(Buffer *vector);
 
 #endif //STRINGBUFFERTEST_STRINGBUFFER_H
