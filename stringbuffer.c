@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : Simple Remote Execution System Linux client
+ Name        : Simple Remote Execution System Linux server
  Author      : Alex
  Version     : 0.9v
  Copyright   : No copyright

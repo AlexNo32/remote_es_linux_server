@@ -11,17 +11,19 @@
 
 int recvRequest(Request *req, Buffer *buf);
 
+void requestInit(Request *req);
+void requestFree(Request *req);
+
 /* Request handling */
 int recv_request(SOCKET sockFd) {
     int loop = 1;
 
     // keep recving message form one client until receive 'quit'
     while (loop) {
+        int i;
         Request req;
         Buffer buf;
-        int i;
-
-        memset(&req, 0, sizeof(Request));
+        requestInit(&req);
         buffer_init(&buf);
 
         /* 1, receive data */
@@ -38,21 +40,46 @@ int recv_request(SOCKET sockFd) {
         for(i = 0; i< req.files; i++){
             buffer_init(&buf);
             recv_Msg(sockFd, &buf);
-
-            /* 3.1 check -f model */
-            /* 3.2 file name */
-            /* 3.3 restore file */
-            buffer_free(&buf);
+            req.attachment[i] = buf;
+//            buffer_free(&buf);
         }
 
         /* 4, response */
         if(make_response(&req, sockFd) == 0)
             loop = 0;
+
+        /* free memory */
+        requestFree(&req);
     }
+
     close(sockFd);
     return 0;
 }
 
+void requestInit(Request *req){
+    int i;
+    memset(req, 0, sizeof(Request));
+    req->dirname = malloc(50);
+
+    for(i = 0; i < 10; i++){
+        req->argv[i] = malloc(50);
+        req->filev[i] = malloc(50);
+        buffer_init(req->attachment);
+    }
+}
+
+void requestFree(Request *req){
+    int i;
+    free(req->dirname);
+
+    for(i = 0; i < 10; i++){
+        free(req->argv[i]);
+        free(req->filev[i]);
+        buffer_free(req->attachment);
+    }
+}
+
+/* 2, decomposition data */
 int recvRequest(Request *req, Buffer *buf){
     int nCount = 0, i;
     char *tmp;

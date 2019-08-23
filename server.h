@@ -59,7 +59,7 @@ typedef struct {
     unsigned short files;
     char *argv[10];
     char *filev[10];
-    FILE *file[10];
+    Buffer attachment[10];
 } Request;
 
 typedef struct {
