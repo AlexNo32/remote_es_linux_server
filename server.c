@@ -163,15 +163,20 @@ void closeConnection(SOCKET sock){
 /* receive message */
 int recv_Msg(SOCKET sockFd, Buffer *buf){
     int nCount;
-    char buff[STDBUF];
+    char *sockData;
+    sockData = (char *)malloc(sizeof(char) * STDBUF);
+    memset(sockData, 0, sizeof(char) * STDBUF);
 
     while(1){
-        nCount = recv(sockFd, buff, STDBUF, 0);
-        buffer_append(buf, buff, nCount);
+        nCount = recv(sockFd, sockData, STDBUF, 0);
+        buffer_append(buf, sockData, strlen(sockData));
+        memset(sockData, 0, sizeof(char) * STDBUF);
+
         if(nCount < STDBUF)
             break;
     }
 
+    free(sockData);
     return 0;
 }
 

@@ -39,5 +39,6 @@ void buffer_append_timestamp(Buffer *buf, long long value){
 }
 
 void buffer_free(Buffer *buf) {
+    buf->size = 0;
     free(buf->data);
 }

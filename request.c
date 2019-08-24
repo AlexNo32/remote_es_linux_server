@@ -29,19 +29,13 @@ int recv_request(SOCKET sockFd) {
         /* 1, receive data */
         recv_Msg(sockFd, &buf);
 
-        /* debug */
-        printf("server receive %s\n", buf.data);
-
         /* 2, decomposition data */
         recvRequest(&req, &buf);
-        buffer_free(&buf);
 
         /* 3, receive attachment if necessary */
         for(i = 0; i< req.files; i++){
-            buffer_init(&buf);
-            recv_Msg(sockFd, &buf);
-            req.attachment[i] = buf;
-//            buffer_free(&buf);
+            buffer_init(&req.attachment[i]);
+            recv_Msg(sockFd, &req.attachment[i]);
         }
 
         /* 4, response */
@@ -49,6 +43,7 @@ int recv_request(SOCKET sockFd) {
             loop = 0;
 
         /* free memory */
+        buffer_free(&buf);
         requestFree(&req);
     }
 
@@ -75,7 +70,7 @@ void requestFree(Request *req){
     for(i = 0; i < 10; i++){
         free(req->argv[i]);
         free(req->filev[i]);
-        buffer_free(req->attachment);
+        buffer_free(&req->attachment[i]);
     }
 }
 
@@ -119,23 +114,23 @@ int recvRequest(Request *req, Buffer *buf){
 
     /* read dirname */
     sscanf(buf->data + nCount, "%[^&]", tmp);
-    nCount += strlen(tmp);
-    req->dirname = tmp;
+    snprintf(req->dirname, strlen(tmp) + 1, "%s", tmp);
+    nCount += strlen(tmp) + 1;
     memset(tmp, 0 ,25);
 
     /* read argv if necessary */
     for(i = 0; i < req->args; i++){
         sscanf(buf->data + nCount, "%[^&]", tmp);
-        nCount += strlen(tmp);
-        req->argv[i] = tmp;
+        snprintf(req->argv[i], strlen(tmp) + 1, "%s", tmp);
+        nCount += strlen(tmp) + 1;
         memset(tmp, 0, 50);
     }
 
     /* read files if necessary */
     for(i = 0; i < req->files; i++){
         sscanf(buf->data + nCount, "%[^&]", tmp);
-        nCount += strlen(tmp);
-        req->filev[i] = tmp;
+        snprintf(req->filev[i], strlen(tmp) + 1, "%s", tmp);
+        nCount += strlen(tmp) + 1;
         memset(tmp, 0, 20);
     }
 

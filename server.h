@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <sys/stat.h>
 
 typedef unsigned int SOCKET;
 typedef struct sockaddr_in SOCKADDR_IN;
