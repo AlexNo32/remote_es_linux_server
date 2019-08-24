@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/server.dir/server.c.o CMakeFiles/server.dir/request.c.o CMakeFiles/server.dir/stringbuffer.c.o CMakeFiles/server.dir/response.c.o  -o server 

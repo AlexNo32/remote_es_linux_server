@@ -1,0 +1,3 @@
+/home/charname/CLionProjects/2019/2803ict/assignment_1/remote_es_linux_server/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/charname/CLionProjects/2019/2803ict/assignment_1/remote_es_linux_server/cmake-build-debug/CMakeFiles/server.dir
+/home/charname/CLionProjects/2019/2803ict/assignment_1/remote_es_linux_server/cmake-build-debug/CMakeFiles/edit_cache.dir

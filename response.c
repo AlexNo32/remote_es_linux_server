@@ -67,9 +67,6 @@ int make_response(Request *req, SOCKET sock) {
     fillResponse(&resp, &buf);
     send_Msg(sock, &buf);
 
-    /* debug */
-    printf("Server send: %s\n", buf.data);
-
     /* clean memory */
     buffer_free(&buf);
     responseFree(&resp);
@@ -78,7 +75,7 @@ int make_response(Request *req, SOCKET sock) {
 
 void responseInit(Response *resp){
     memset(resp, 0, sizeof(Response));
-    resp->response = malloc(5120);
+    resp->response = malloc(1024 * 10);
 }
 
 void responseFree(Response *resp){
@@ -90,6 +87,7 @@ int put(Request *req, Response *resp){
     char *fPath;
     fPath = (char *) malloc(sizeof(char) * 128);
     memset(fPath, 0, sizeof(char) * 128);
+
     /* 1, make a project folder if not exist */
     if (access(req->dirname, 0) == -1)
         mkdir(req->dirname, 0777);
@@ -98,18 +96,19 @@ int put(Request *req, Response *resp){
         removedir(req->dirname);
         mkdir(req->dirname, 0777);
     }
+
     /* 2, save files */
     for(i = 0; i < req->files; i++){
-        snprintf(fPath, 128, "%s/%s", req->dirname, req->filev[i]);
+        snprintf(fPath, 128, "./%s/%s", req->dirname, req->filev[i]);
         storeFile(fPath, req->attachment[i].data);
         memset(fPath, 0, sizeof(char) * 128);
     }
 
     free(fPath);
-
     /* 3, fill response */
     resp->success = 1;
-    resp->response = "[Server] Upload success.\n";
+    char *reply = "[INFO] Upload success...\n";
+    snprintf(resp->response, strlen(reply), "%s", reply);
 
     return 0;
 }
@@ -196,8 +195,8 @@ int removedir(char *dirname) {
 int storeFile(char *filename, char *content){
     FILE *fptr;
 
-    fptr = fopen(filename, "rw");
-    fprintf(fptr,"%s", content);
+    fptr = fopen(filename,"wb");
+    fwrite(content, 1, strlen(content), fptr);
 
     fclose(fptr);
     return 0;
