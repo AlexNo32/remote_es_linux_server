@@ -25,6 +25,8 @@ void buffer_append(Buffer *buffer, char* value, size_t nCount);
 
 void buffer_append_short(Buffer *buf, int value);
 
+void buffer_append_int(Buffer *buf, int value);
+
 void buffer_append_timestamp(Buffer *buf, long long value);
 
 void buffer_free(Buffer *vector);

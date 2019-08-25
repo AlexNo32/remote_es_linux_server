@@ -33,10 +33,12 @@ int recv_request(SOCKET sockFd) {
         recvRequest(&req, &buf);
 
         /* 3, receive attachment if necessary */
-        for(i = 0; i< req.files; i++){
-            buffer_init(&req.attachment[i]);
-            recv_Msg(sockFd, &req.attachment[i]);
-        }
+        if(req.ptype == PUT)
+            for(i = 0; i< req.files; i++){
+                printf("[Server] Server receiving file: %s in dir: %s. \n", req.filev[i], req.dirname);
+                buffer_init(&req.attachment[i]);
+                recv_Msg(sockFd, &req.attachment[i]);
+            }
 
         /* 4, response */
         if(make_response(&req, sockFd) == 0)

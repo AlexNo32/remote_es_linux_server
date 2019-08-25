@@ -21,6 +21,8 @@ int execution(char* cmd, Buffer* buf);
 int fillResponse(Response *resp, Buffer *buf);
 int removedir(char *dirname);
 int storeFile(char *filename, char *content);
+int getFileSize(FILE * fp);
+int loadFile(char *fPath, Buffer *buf);
 
 void responseInit(Response *resp);
 void responseFree(Response *resp);
@@ -56,7 +58,7 @@ int make_response(Request *req, SOCKET sock) {
             break;
         case QUIT :
             quit(req, &resp);
-            printf("[Server] Client socket %d closing...\n");
+            printf("[Server] Client socket %d closing...\n", sock);
             q = 0;
             break;
         default :
@@ -110,18 +112,48 @@ int put(Request *req, Response *resp){
     char *reply = "[INFO] Upload success...\n";
     snprintf(resp->response, strlen(reply), "%s", reply);
 
+    printf("[Server] Request 'put' response %d\n", strlen(resp->response));
+
     return 0;
 }
 
 int get(Request *req, Response *resp){
+    Buffer buf;
+    char * fPath;
+    buffer_init(&buf);
+
+    /* 1, fetch file */
+    fPath = (char *)malloc(sizeof(char) * 128);
+    memset(fPath, 0 ,sizeof(char) * 128);
+    snprintf(fPath, 128, "./%s/%s", req->dirname, req->filev[0]);
+
+    /* 2, if file exist, load file */
+    if(loadFile(fPath, &buf) == 0)
+        snprintf(resp->response, buf.size, "%s", buf.data);
+    else{
+        /* 3, if not exist, return msg */
+        char *reply = "[INFO] Load file exception...\n";
+        snprintf(resp->response, strlen(reply), "%s", reply);
+    }
+
+    resp->success = 1;
+    free(fPath);
+    buffer_free(&buf);
+
+    printf("[Server] Request 'get' response %d\n", strlen(resp->response));
+
     return 0;
 }
 
 int run(Request *req, Response *resp){
+
+    printf("[Server] Request 'run' response %d\n", strlen(resp->response));
     return 0;
 }
 
 int list(Request *req, Response *resp){
+
+    printf("[Server] Request 'list' response %d\n", strlen(resp->response));
     return 0;
 }
 
@@ -140,8 +172,11 @@ int sys(Request *req, Response *resp){
         buffer_append(&buf, "&", 1);
     }
 
+    resp->success = 1;
     memcpy(resp->response, buf.data, buf.size);
     buffer_free(&buf);
+
+    printf("[Server] Request 'sys' response %d\n", strlen(resp->response));
     return 0;
 }
 
@@ -202,11 +237,49 @@ int storeFile(char *filename, char *content){
     return 0;
 }
 
+/* fetch file */
+int loadFile(char *fPath, Buffer *buf){
+    FILE *fptr;
+    int fileLen, nCount;
+    char *fTemp;
+
+    fptr = fopen(fPath, "rb");
+    if (fptr == NULL)
+        return -1;
+
+    fileLen = getFileSize(fptr);
+    fTemp = (char*) malloc (sizeof(char) * fileLen);
+    memset(fTemp, 0, sizeof(char) * fileLen);
+
+    if (fTemp == NULL)
+        return -1;
+
+    nCount = fread (fTemp, 1, fileLen, fptr);
+    if (nCount != fileLen)
+        return -1;
+    buffer_append(buf, fTemp, fileLen);
+
+    fclose(fptr);
+    free(fTemp);
+
+    return 0;
+}
+
 int fillResponse(Response *resp, Buffer *buf){
+    char itc[10];
     buffer_append_timestamp(buf, resp->timeStamp);
     buffer_append_short(buf, resp->ptype);
     buffer_append_short(buf, resp->success);
-    buffer_append(buf, resp->response, strlen(resp->response));
+    buffer_append_int(buf, strlen(resp->response));
     buffer_append(buf, "&", 1);
+    buffer_append(buf, resp->response, strlen(resp->response));
     return 0;
+}
+
+/* return file length */
+int getFileSize(FILE * fp) {
+    fseek(fp, 0L, SEEK_END);
+    int size = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    return size;
 }

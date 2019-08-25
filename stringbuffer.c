@@ -34,6 +34,10 @@ void buffer_append_short(Buffer *buf, int value){
     buf->size += snprintf(buf->data + buf->size, 2, "%d", value);
 }
 
+void buffer_append_int(Buffer *buf, int value){
+    buf->size += sprintf(buf->data + buf->size, "%d", value);
+}
+
 void buffer_append_timestamp(Buffer *buf, long long value){
     buf->size += snprintf(buf->data + buf->size, 14, "%lld", value);
 }
