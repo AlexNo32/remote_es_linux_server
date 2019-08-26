@@ -152,7 +152,20 @@ int run(Request *req, Response *resp){
 }
 
 int list(Request *req, Response *resp){
+    char *cmdSet[2] = {"ls ", "ls -l"};
 
+    Buffer buf;
+    buffer_init(&buf);
+
+    if(req->lmode)
+        execution(cmdSet[1], &buf);
+    else
+        execution(cmdSet[0], &buf);
+
+    snprintf(resp->response, buf.size, "%s", buf.data);
+    resp->success = 1;
+
+    buffer_free(&buf);
     printf("[Server] Request 'list' response %d\n", strlen(resp->response));
     return 0;
 }
@@ -161,9 +174,9 @@ int sys(Request *req, Response *resp){
     char *exp[3] = {"Computer name: ", "\nOperation System: ", "\nCPU type: "};
 
 #ifdef WIN64
-    char *commSet[3] = { "hostname", "ver", "wmic cpu get name | find /v \"Name\"" };
+    char *cmdSet[3] = { "hostname", "ver", "wmic cpu get name | find /v \"Name\"" };
 #else
-    char *commSet[3] = { "hostname", "cat /proc/version", "cat /proc/cpuinfo | grep 'model name' | cut -d ':' -f 2 | uniq" };
+    char *cmdSet[3] = { "hostname", "cat /proc/version", "cat /proc/cpuinfo | grep 'model name' | cut -d ':' -f 2 | uniq" };
 #endif
     Buffer buf;
     buffer_init(&buf);
@@ -171,7 +184,7 @@ int sys(Request *req, Response *resp){
     int i;
     for(i = 0; i < 3; i++){
         buffer_append(&buf, exp[i], strlen(exp[i]));
-        execution(commSet[i], &buf);
+        execution(cmdSet[i], &buf);
     }
 
     snprintf(resp->response, buf.size, "%s", buf.data);
