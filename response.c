@@ -158,6 +158,8 @@ int list(Request *req, Response *resp){
 }
 
 int sys(Request *req, Response *resp){
+    char *exp[3] = {"Computer name: ", "\nOperation System: ", "\nCPU type: "};
+
 #ifdef WIN64
     char *commSet[3] = { "hostname", "ver", "wmic cpu get name | find /v \"Name\"" };
 #else
@@ -168,14 +170,14 @@ int sys(Request *req, Response *resp){
 
     int i;
     for(i = 0; i < 3; i++){
+        buffer_append(&buf, exp[i], strlen(exp[i]));
         execution(commSet[i], &buf);
-        buffer_append(&buf, "&", 1);
     }
 
+    snprintf(resp->response, buf.size, "%s", buf.data);
     resp->success = 1;
-    memcpy(resp->response, buf.data, buf.size);
-    buffer_free(&buf);
 
+    buffer_free(&buf);
     printf("[Server] Request 'sys' response %d\n", strlen(resp->response));
     return 0;
 }
