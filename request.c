@@ -57,7 +57,7 @@ void requestInit(Request *req){
     int i;
     memset(req, 0, sizeof(Request));
     req->dirname = malloc(50);
-    memset(req->dirname, 0, strlen(req->dirname));
+    memset(req->dirname, 0, 50);
 
     for(i = 0; i < 10; i++){
         req->argv[i] = malloc(50);
@@ -69,6 +69,7 @@ void requestInit(Request *req){
 void requestFree(Request *req){
     int i;
     free(req->dirname);
+    memset(req->dirname, 0, 50);
 
     for(i = 0; i < 10; i++){
         free(req->argv[i]);
@@ -81,52 +82,57 @@ void requestFree(Request *req){
 int recvRequest(Request *req, Buffer *buf){
     int nCount = 0, i;
     char *tmp;
-    tmp = malloc(25);
-    memset(tmp, 0 ,25);
+    tmp = malloc(64);
+    memset(tmp, 0 ,64);
 
     /* read timestamp */
     sscanf(buf->data, "%13s", tmp);
     req->timeStamp = atoll(tmp);
-    memset(tmp, 0 ,13);
+    memset(tmp, 0 ,64);
     nCount += 13;
 
     /* read ptype */
     sscanf(buf->data + nCount++, "%1s", tmp);
     req->ptype = (short)atoi(tmp);
-    memset(tmp, 0 ,1);
+    memset(tmp, 0 ,64);
 
     /* read fmode */
     sscanf(buf->data + nCount++, "%1s", tmp);
     req->fmode = (short)atoi(tmp);
-    memset(tmp, 0 ,1);
+    memset(tmp, 0 ,64);
 
     /* read lmode */
     sscanf(buf->data + nCount++, "%1s", tmp);
     req->lmode = (short)atoi(tmp);
-    memset(tmp, 0 ,1);
+    memset(tmp, 0 ,64);
 
     /* read args */
     sscanf(buf->data + nCount++, "%1s", tmp);
     req->args = (short)atoi(tmp);
-    memset(tmp, 0 ,1);
+    memset(tmp, 0 ,64);
 
     /* read files */
     sscanf(buf->data + nCount++, "%1s", tmp);
     req->files = (short)atoi(tmp);
-    memset(tmp, 0 ,1);
+    memset(tmp, 0 ,64);
+
+    /* read direxist */
+    sscanf(buf->data + nCount++, "%1s", tmp);
+    req->direxist = (short)atoi(tmp);
+    memset(tmp, 0 ,64);
 
     /* read dirname */
     sscanf(buf->data + nCount, "%[^&]", tmp);
     snprintf(req->dirname, strlen(tmp) + 1, "%s", tmp);
     nCount += strlen(tmp) + 1;
-    memset(tmp, 0 ,25);
+    memset(tmp, 0 ,64);
 
     /* read argv if necessary */
     for(i = 0; i < req->args; i++){
         sscanf(buf->data + nCount, "%[^&]", tmp);
         snprintf(req->argv[i], strlen(tmp) + 1, "%s", tmp);
         nCount += strlen(tmp) + 1;
-        memset(tmp, 0, 50);
+        memset(tmp, 0, 64);
     }
 
     /* read files if necessary */
@@ -134,22 +140,9 @@ int recvRequest(Request *req, Buffer *buf){
         sscanf(buf->data + nCount, "%[^&]", tmp);
         snprintf(req->filev[i], strlen(tmp) + 1, "%s", tmp);
         nCount += strlen(tmp) + 1;
-        memset(tmp, 0, 20);
+        memset(tmp, 0, 64);
     }
 
     free(tmp);
     return 0;
-}
-
-
-
-/* verify file 1. c or cpp source. 2 file exist. */
-int fileExist(char * filePath) {
-
-    if (access(filePath, 0) == -1) {
-        printf("[ERROR] The program %s already exist.\n", filePath);
-        return -1;
-    }
-
-    return 1;
 }

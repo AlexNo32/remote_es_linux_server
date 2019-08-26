@@ -161,14 +161,12 @@ int list(Request *req, Response *resp){
     cmd = (char *) malloc(sizeof(char) * 64);
     memset(cmd, 0, sizeof(char) * 64);
 
-    if(req->lmode){
-        strcat(cmd, cmdSet[1]);
-    }else{
-        strcat(cmd, cmdSet[0]);
-    }
+    strcat(cmd, cmdSet[req->lmode]);
 
-    if(strlen(req->dirname) != 0)
+    printf("dir exist: %d\n", req->direxist);
+    if(req->direxist)
         strcat(cmd, req->dirname);
+
 //        snprintf(cmd + n, strlen(req->dirname) + 1, "%s", req->dirname);
 
     printf("list cmd: %s\n", cmd);
