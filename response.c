@@ -152,20 +152,34 @@ int run(Request *req, Response *resp){
 }
 
 int list(Request *req, Response *resp){
-    char *cmdSet[2] = {"ls ", "ls -l"};
-
+    char *cmdSet[2] = {"ls ", "ls -l "};
+    char *cmd;
+    int n = 0;
     Buffer buf;
     buffer_init(&buf);
 
-    if(req->lmode)
-        execution(cmdSet[1], &buf);
-    else
-        execution(cmdSet[0], &buf);
+    cmd = (char *) malloc(sizeof(char) * 64);
+    memset(cmd, 0, sizeof(char) * 64);
+
+    if(req->lmode){
+        strcat(cmd, cmdSet[1]);
+    }else{
+        strcat(cmd, cmdSet[0]);
+    }
+
+    if(strlen(req->dirname) != 0)
+        strcat(cmd, req->dirname);
+//        snprintf(cmd + n, strlen(req->dirname) + 1, "%s", req->dirname);
+
+    printf("list cmd: %s\n", cmd);
+
+    execution(cmd, &buf);
 
     snprintf(resp->response, buf.size, "%s", buf.data);
     resp->success = 1;
 
     buffer_free(&buf);
+    free(cmd);
     printf("[Server] Request 'list' response %d\n", strlen(resp->response));
     return 0;
 }
@@ -187,7 +201,7 @@ int sys(Request *req, Response *resp){
         execution(cmdSet[i], &buf);
     }
 
-    snprintf(resp->response, buf.size, "%s", buf.data);
+    snprintf(resp->response, buf.size + 1, "%s", buf.data);
     resp->success = 1;
 
     buffer_free(&buf);

@@ -57,6 +57,7 @@ void requestInit(Request *req){
     int i;
     memset(req, 0, sizeof(Request));
     req->dirname = malloc(50);
+    memset(req->dirname, 0, strlen(req->dirname));
 
     for(i = 0; i < 10; i++){
         req->argv[i] = malloc(50);
