@@ -91,13 +91,21 @@ int put(Request *req, Response *resp){
     memset(fPath, 0, sizeof(char) * 128);
 
     /* 1, make a project folder if not exist */
+#ifdef WIN32
+    if (_access(req->dirname, 0) == -1)
+		_mkdir(req->dirname, 0777);
+	else if (req->fmode) {
+		removedir(req->dirname);
+		_mkdir(req->dirname, 0777);
+}
+#else
     if (access(req->dirname, 0) == -1)
         mkdir(req->dirname, 0777);
-
-    else if(req->fmode){
+    else if (req->fmode) {
         removedir(req->dirname);
         mkdir(req->dirname, 0777);
     }
+#endif // WIN32
 
     /* 2, save files */
     for(i = 0; i < req->files; i++){
@@ -112,7 +120,7 @@ int put(Request *req, Response *resp){
     char *reply = "[INFO] Upload success...\n";
     snprintf(resp->response, strlen(reply), "%s", reply);
 
-    printf("[Server] Request 'put' response %d\n", strlen(resp->response));
+    printf("[Server] Request 'put' response %ld\n", strlen(resp->response));
 
     return 0;
 }
@@ -140,14 +148,14 @@ int get(Request *req, Response *resp){
     free(fPath);
     buffer_free(&buf);
 
-    printf("[Server] Request 'get' response %d\n", strlen(resp->response));
+    printf("[Server] Request 'get' response %ld\n", strlen(resp->response));
 
     return 0;
 }
 
 int run(Request *req, Response *resp){
 
-    printf("[Server] Request 'run' response %d\n", strlen(resp->response));
+    printf("[Server] Request 'run' response %ld\n", strlen(resp->response));
     return 0;
 }
 
@@ -163,8 +171,13 @@ int list(Request *req, Response *resp){
 
     strcat(cmd, cmdSet[req->lmode]);
 
-    if(strlen(req->dirname) != 0)
+    printf("dir exist: %d\n", req->direxist);
+    if(req->direxist)
         strcat(cmd, req->dirname);
+
+//        snprintf(cmd + n, strlen(req->dirname) + 1, "%s", req->dirname);
+
+    printf("list cmd: %s\n", cmd);
 
     execution(cmd, &buf);
 
@@ -173,14 +186,14 @@ int list(Request *req, Response *resp){
 
     buffer_free(&buf);
     free(cmd);
-    printf("[Server] Request 'list' response %d\n", strlen(resp->response));
+    printf("[Server] Request 'list' response %ld\n", strlen(resp->response));
     return 0;
 }
 
 int sys(Request *req, Response *resp){
     char *exp[3] = {"Computer name: ", "\nOperation System: ", "\nCPU type: "};
 
-#ifdef WIN64
+#ifdef WIN32
     char *cmdSet[3] = { "hostname", "ver", "wmic cpu get name | find /v \"Name\"" };
 #else
     char *cmdSet[3] = { "hostname", "cat /proc/version", "cat /proc/cpuinfo | grep 'model name' | cut -d ':' -f 2 | uniq" };
@@ -198,7 +211,7 @@ int sys(Request *req, Response *resp){
     resp->success = 1;
 
     buffer_free(&buf);
-    printf("[Server] Request 'sys' response %d\n", strlen(resp->response));
+    printf("[Server] Request 'sys' response %ld\n", strlen(resp->response));
     return 0;
 }
 
@@ -212,7 +225,7 @@ int execution(char* cmd, Buffer* buf) {
     char *temp;
     temp = (char*) malloc (sizeof(char) * 125);
 
-#ifdef WIN64
+#ifdef WIN32
     FILE* pipe = _popen(cmd, "r");
 #else
     FILE *pipe = popen(cmd, "r");
@@ -226,7 +239,7 @@ int execution(char* cmd, Buffer* buf) {
             buffer_append(buf, temp, strlen(temp));
         }
     }
-#ifdef WIN64
+#ifdef WIN32
     _pclose(pipe);
 #else
     pclose(pipe);
@@ -288,7 +301,7 @@ int loadFile(char *fPath, Buffer *buf){
 }
 
 int fillResponse(Response *resp, Buffer *buf){
-    char itc[10];
+    //char itc[10];
     buffer_append_timestamp(buf, resp->timeStamp);
     buffer_append_short(buf, resp->ptype);
     buffer_append_short(buf, resp->success);

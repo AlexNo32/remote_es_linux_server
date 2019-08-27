@@ -17,7 +17,7 @@
 #include <errno.h>
 #include "stringbuffer.h"
 
-#ifdef WIN64
+#ifdef WIN32
 #include <winsock2.h>
 #include <windows.h>
 #include <io.h>
@@ -55,6 +55,7 @@ typedef struct {
     unsigned short ptype; // [4 - 9]
     unsigned short fmode; // 1: On, 0: Off
     unsigned short lmode; // 1: On, 0: Off
+    unsigned short direxist; // 1: dir exist, 0: not
     char * dirname; // folder name
     unsigned short args;
     unsigned short files;

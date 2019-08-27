@@ -28,7 +28,7 @@ int main(void) {
 /* Initial socket connection */
 SOCKET connector(){
 /* Initialize Winsock. */
-#ifdef WIN64
+#ifdef WIN32
     WSADATA wsaData;
 	check(WSAStartup(MAKEWORD(2, 2), &wsaData) == NO_ERROR, "[ERROR] WSAStartup failed... \n");
 #endif
@@ -73,7 +73,7 @@ int listener(SOCKET server) {
     SOCKADDR_IN addrClient;
     int len = sizeof(SOCKADDR);
 
-#ifdef WIN64
+#ifdef WIN32
     STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
@@ -93,7 +93,7 @@ int listener(SOCKET server) {
         SOCKET client = accept(server, (SOCKADDR*)&addrClient, &len);
         check(client > 0, "[Error] accept function failed... \n");
         printf("[INFO] New client [ %d ] is connected... \n", client);
-#ifdef WIN64
+#ifdef WIN32
         /* create process (Win64) */
 		check(!CreateProcess(NULL,   // No module name (use command line)
 			NULL,   // Command line
@@ -108,7 +108,8 @@ int listener(SOCKET server) {
 			"[ERROR] CreateProcess failed. \n");
 
 		// request handling
-		clientHandle(clientSocket);
+		closeConnection(server);
+		recv_request(client);
 
 		// Wait until child process exits.
 		WaitForSingleObject(pi.hProcess, INFINITE);
@@ -138,7 +139,7 @@ int listener(SOCKET server) {
 
 /* Zombie removal*/
 void sigChld(int signo){
-#ifdef WIN64
+#ifdef WIN32
     //do nothing
 #else
     pid_t pid;
@@ -151,7 +152,7 @@ void sigChld(int signo){
 
 /* clean up socket */
 void closeConnection(SOCKET sock){
-#ifdef WIN64
+#ifdef WIN32
     closesocket(sock);
 	WSACleanup(); //Clean up Winsock
 #else

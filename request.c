@@ -48,20 +48,23 @@ int recv_request(SOCKET sockFd) {
         buffer_free(&buf);
         requestFree(&req);
     }
-
+#ifdef WIN32
+    _close(sockFd);
+#else
     close(sockFd);
+#endif
     return 0;
 }
 
 void requestInit(Request *req){
     int i;
     memset(req, 0, sizeof(Request));
-    req->dirname = malloc(50);
-    memset(req->dirname, 0, 50);
+    req->dirname = malloc(64);
+    memset(req->dirname, 0, 64);
 
     for(i = 0; i < 10; i++){
-        req->argv[i] = malloc(50);
-        req->filev[i] = malloc(50);
+        req->argv[i] = malloc(64);
+        req->filev[i] = malloc(64);
         buffer_init(req->attachment);
     }
 }
@@ -114,6 +117,11 @@ int recvRequest(Request *req, Buffer *buf){
     /* read files */
     sscanf(buf->data + nCount++, "%1s", tmp);
     req->files = (short)atoi(tmp);
+    memset(tmp, 0 ,64);
+
+    /* read direxist */
+    sscanf(buf->data + nCount++, "%1s", tmp);
+    req->direxist = (short)atoi(tmp);
     memset(tmp, 0 ,64);
 
     /* read dirname */
