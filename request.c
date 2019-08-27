@@ -72,7 +72,6 @@ void requestInit(Request *req){
 void requestFree(Request *req){
     int i;
     free(req->dirname);
-    memset(req->dirname, 0, 50);
 
     for(i = 0; i < 10; i++){
         free(req->argv[i]);
