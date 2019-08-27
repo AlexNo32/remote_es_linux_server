@@ -171,13 +171,12 @@ int list(Request *req, Response *resp){
 
     strcat(cmd, cmdSet[req->lmode]);
 
-    printf("dir exist: %d\n", req->direxist);
-    if(req->direxist)
+    if(strlen(req->dirname) != 0)
         strcat(cmd, req->dirname);
 
 //        snprintf(cmd + n, strlen(req->dirname) + 1, "%s", req->dirname);
 
-    printf("list cmd: %s\n", cmd);
+    //printf("list cmd: %s\n", cmd);
 
     execution(cmd, &buf);
 

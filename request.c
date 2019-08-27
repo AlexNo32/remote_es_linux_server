@@ -118,11 +118,6 @@ int recvRequest(Request *req, Buffer *buf){
     req->files = (short)atoi(tmp);
     memset(tmp, 0 ,64);
 
-    /* read direxist */
-    sscanf(buf->data + nCount++, "%1s", tmp);
-    req->direxist = (short)atoi(tmp);
-    memset(tmp, 0 ,64);
-
     /* read dirname */
     sscanf(buf->data + nCount, "%[^&]", tmp);
     snprintf(req->dirname, strlen(tmp) + 1, "%s", tmp);
