@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/home/charname/CLionProjects/2019/2803ict/assignment_1/remote_es_linux_server/request.c
+server.h
+/home/charname/CLionProjects/2019/2803ict/assignment_1/remote_es_linux_server/server.h
+
 /home/charname/CLionProjects/2019/2803ict/assignment_1/remote_es_linux_server/response.c
 server.h
 /home/charname/CLionProjects/2019/2803ict/assignment_1/remote_es_linux_server/server.h

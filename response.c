@@ -78,6 +78,7 @@ int make_response(Request *req, SOCKET sock) {
 void responseInit(Response *resp){
     memset(resp, 0, sizeof(Response));
     resp->response = (char *)malloc(sizeof(char) * 1024 * 10);
+    memset(resp->response, 0, sizeof(char) * 1024 * 10);
 }
 
 void responseFree(Response *resp){
@@ -178,13 +179,13 @@ int list(Request *req, Response *resp){
 #ifdef WIN32
 
     if (req->lmode) {// icalcs
-		if (strlen(req->dirname == 0))
+		if (req->dirname == "")
 			snprintf(cmd, strlen(cmdSet[1]) + 1, "%s *", cmdSet[1]);
 		else
 			snprintf(cmd, strlen(cmdSet[1]) + strlen(req->dirname) + 1, "%s %s\*", cmdSet[1], req->dirname);
 
 	}else {// dir
-		if (strlen(req->dirname == 0)) {
+		if (req->dirname == "") {
 			snprintf(cmd, strlen(cmdSet[0]) + 1,"%s", cmdSet[0]);
 		}else {
 			snprintf(cmd, strlen(cmdSet[1]) + strlen(req->dirname) + 1, "%s %s", cmdSet[0], req->dirname);
@@ -193,7 +194,7 @@ int list(Request *req, Response *resp){
 
 #else
     strcat(cmd, cmdSet[req->lmode]);
-    if (strlen(req->dirname) != 0)
+    if (req->dirname != "")
         strcat(cmd, req->dirname);
 #endif // WIN32
     execution(cmd, &buf);

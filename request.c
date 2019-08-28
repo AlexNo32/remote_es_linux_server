@@ -151,6 +151,6 @@ int recvRequest(Request *req, Buffer *buf){
         }
     }
 
-    free(tmp);
+    //free(tmp);
     return 0;
 }
