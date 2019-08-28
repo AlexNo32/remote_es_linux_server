@@ -77,7 +77,7 @@ int make_response(Request *req, SOCKET sock) {
 
 void responseInit(Response *resp){
     memset(resp, 0, sizeof(Response));
-    resp->response = malloc(1024 * 10);
+    resp->response = (char *)malloc(sizeof(char) * 1024 * 10);
 }
 
 void responseFree(Response *resp){
@@ -160,7 +160,13 @@ int run(Request *req, Response *resp){
 }
 
 int list(Request *req, Response *resp){
-    char *cmdSet[2] = {"ls ", "ls -l "};
+#ifdef WIN32
+    char* cmdSet[2] = { "dir ", "icacls"};
+#else
+    char* cmdSet[2] = { "ls ", "ls -l " };
+#endif // WIN32
+
+
     char *cmd;
     int n = 0;
     Buffer buf;
@@ -169,15 +175,27 @@ int list(Request *req, Response *resp){
     cmd = (char *) malloc(sizeof(char) * 64);
     memset(cmd, 0, sizeof(char) * 64);
 
+#ifdef WIN32
+
+    if (req->lmode) {// icalcs
+		if (strlen(req->dirname == 0))
+			snprintf(cmd, strlen(cmdSet[1]) + 1, "%s *", cmdSet[1]);
+		else
+			snprintf(cmd, strlen(cmdSet[1]) + strlen(req->dirname) + 1, "%s %s\*", cmdSet[1], req->dirname);
+
+	}else {// dir
+		if (strlen(req->dirname == 0)) {
+			snprintf(cmd, strlen(cmdSet[0]) + 1,"%s", cmdSet[0]);
+		}else {
+			snprintf(cmd, strlen(cmdSet[1]) + strlen(req->dirname) + 1, "%s %s", cmdSet[0], req->dirname);
+		}
+	}
+
+#else
     strcat(cmd, cmdSet[req->lmode]);
-
-    if(strlen(req->dirname) != 0)
+    if (strlen(req->dirname) != 0)
         strcat(cmd, req->dirname);
-
-//        snprintf(cmd + n, strlen(req->dirname) + 1, "%s", req->dirname);
-
-    //printf("list cmd: %s\n", cmd);
-
+#endif // WIN32
     execution(cmd, &buf);
 
     snprintf(resp->response, buf.size, "%s", buf.data);
@@ -222,8 +240,8 @@ int quit(Request *req, Response *resp){
 /* exec command line */
 int execution(char* cmd, Buffer* buf) {
     char *temp;
-    temp = (char*) malloc (sizeof(char) * 125);
-
+    temp = (char*) malloc (sizeof(char) * 512);
+    memset(temp, 0, sizeof(char) * 512);
 #ifdef WIN32
     FILE* pipe = _popen(cmd, "r");
 #else
@@ -234,7 +252,7 @@ int execution(char* cmd, Buffer* buf) {
         return 0;
 
     while (!feof(pipe)) {
-        if (fgets(temp, 125, pipe)) {
+        if (fgets(temp, 512, pipe)) {
             buffer_append(buf, temp, strlen(temp));
         }
     }

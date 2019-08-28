@@ -59,12 +59,14 @@ int recv_request(SOCKET sockFd) {
 void requestInit(Request *req){
     int i;
     memset(req, 0, sizeof(Request));
-    req->dirname = malloc(64);
-    memset(req->dirname, 0, 64);
+    req->dirname = (char *)malloc(sizeof(char) * 64);
+    memset(req->dirname, 0, sizeof(char) * 64);
 
     for(i = 0; i < 10; i++){
-        req->argv[i] = malloc(64);
-        req->filev[i] = malloc(64);
+        req->argv[i] = (char *)malloc(sizeof(char) * 64);
+        memset(req->argv[i], 0, sizeof(char) * 64);
+        req->filev[i] = (char *)malloc(sizeof(char) * 64);
+        memset(req->filev[i], 0, sizeof(char) * 64);
         buffer_init(req->attachment);
     }
 }
@@ -84,60 +86,69 @@ void requestFree(Request *req){
 int recvRequest(Request *req, Buffer *buf){
     int nCount = 0, i;
     char *tmp;
-    tmp = malloc(64);
-    memset(tmp, 0 ,64);
+    tmp = (char *) malloc(sizeof(char) * 64);
+    memset(tmp, 0 ,sizeof(char) * 64);
 
     /* read timestamp */
-    sscanf(buf->data, "%13s", tmp);
-    req->timeStamp = atoll(tmp);
-    memset(tmp, 0 ,64);
-    nCount += 13;
+    if(sscanf(buf->data, "%13s", tmp) > 0){
+        req->timeStamp = atoll(tmp);
+        memset(tmp, 0 ,sizeof(char) * 64);
+        nCount += 13;
+    }
 
     /* read ptype */
-    sscanf(buf->data + nCount++, "%1s", tmp);
-    req->ptype = (short)atoi(tmp);
-    memset(tmp, 0 ,64);
+    if(sscanf(buf->data + nCount++, "%1s", tmp) > 0){
+        req->ptype = (short)atoi(tmp);
+        memset(tmp, 0 ,sizeof(char) * 64);
+    }
 
     /* read fmode */
-    sscanf(buf->data + nCount++, "%1s", tmp);
-    req->fmode = (short)atoi(tmp);
-    memset(tmp, 0 ,64);
+    if(sscanf(buf->data + nCount++, "%1s", tmp) > 0){
+        req->fmode = (short)atoi(tmp);
+        memset(tmp, 0 ,sizeof(char) * 64);
+    }
 
     /* read lmode */
-    sscanf(buf->data + nCount++, "%1s", tmp);
-    req->lmode = (short)atoi(tmp);
-    memset(tmp, 0 ,64);
+    if(sscanf(buf->data + nCount++, "%1s", tmp) > 0){
+        req->lmode = (short)atoi(tmp);
+        memset(tmp, 0 ,sizeof(char) * 64);
+    }
 
     /* read args */
-    sscanf(buf->data + nCount++, "%1s", tmp);
-    req->args = (short)atoi(tmp);
-    memset(tmp, 0 ,64);
+    if(sscanf(buf->data + nCount++, "%1s", tmp) > 0){
+        req->args = (short)atoi(tmp);
+        memset(tmp, 0 ,sizeof(char) * 64);
+    }
 
     /* read files */
-    sscanf(buf->data + nCount++, "%1s", tmp);
-    req->files = (short)atoi(tmp);
-    memset(tmp, 0 ,64);
+    if(sscanf(buf->data + nCount++, "%1s", tmp) > 0){
+        req->files = (short)atoi(tmp);
+        memset(tmp, 0 ,sizeof(char) * 64);
+    }
 
     /* read dirname */
-    sscanf(buf->data + nCount, "%[^&]", tmp);
-    snprintf(req->dirname, strlen(tmp) + 1, "%s", tmp);
-    nCount += strlen(tmp) + 1;
-    memset(tmp, 0 ,64);
+    if(sscanf(buf->data + nCount, "%[^&]", tmp) > 0){
+        snprintf(req->dirname, strlen(tmp) + 1, "%s", tmp);
+        nCount += strlen(tmp) + 1;
+        memset(tmp, 0 ,sizeof(char) * 64);
+    }
 
     /* read argv if necessary */
     for(i = 0; i < req->args; i++){
-        sscanf(buf->data + nCount, "%[^&]", tmp);
-        snprintf(req->argv[i], strlen(tmp) + 1, "%s", tmp);
-        nCount += strlen(tmp) + 1;
-        memset(tmp, 0, 64);
+        if(sscanf(buf->data + nCount, "%[^&]", tmp) > 0){
+            snprintf(req->argv[i], strlen(tmp) + 1, "%s", tmp);
+            nCount += strlen(tmp) + 1;
+            memset(tmp, 0 ,sizeof(char) * 64);
+        }
     }
 
     /* read files if necessary */
     for(i = 0; i < req->files; i++){
-        sscanf(buf->data + nCount, "%[^&]", tmp);
-        snprintf(req->filev[i], strlen(tmp) + 1, "%s", tmp);
-        nCount += strlen(tmp) + 1;
-        memset(tmp, 0, 64);
+        if(sscanf(buf->data + nCount, "%[^&]", tmp) > 0){
+            snprintf(req->filev[i], strlen(tmp) + 1, "%s", tmp);
+            nCount += strlen(tmp) + 1;
+            memset(tmp, 0 ,sizeof(char) * 64);
+        }
     }
 
     free(tmp);

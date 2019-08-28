@@ -2,7 +2,7 @@
  ============================================================================
  Name        : Simple Remote Execution System Win64 Server
  Author      : A
- Version     : 0.9v
+ Version     : 1.0v
  Copyright   : No copyright
  Description : 2803ICT assignment 1, Ansi-style, CLion + Ubuntu
  ============================================================================
@@ -108,7 +108,7 @@ int listener(SOCKET server) {
 			"[ERROR] CreateProcess failed. \n");
 
 		// request handling
-		closeConnection(server);
+		//closeConnection(server);
 		recv_request(client);
 
 		// Wait until child process exits.

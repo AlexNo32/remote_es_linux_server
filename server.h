@@ -51,7 +51,7 @@ enum PTYPE{
 };
 
 typedef struct {
-    unsigned long timeStamp;// length: 13
+    long long timeStamp;// length: 13
     unsigned short ptype; // [4 - 9]
     unsigned short fmode; // 1: On, 0: Off
     unsigned short lmode; // 1: On, 0: Off
@@ -64,7 +64,7 @@ typedef struct {
 } Request;
 
 typedef struct {
-    unsigned long timeStamp; // length :13
+    long long timeStamp; // length :13
     unsigned short ptype; // [4 - 9]
     unsigned short success; // 1/0 cmd execute success or not
     char *response; // response message

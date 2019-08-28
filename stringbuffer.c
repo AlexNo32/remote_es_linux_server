@@ -18,7 +18,7 @@ void buffer_init(Buffer *buf) {
     buf->size = 0;
     buf->capacity = BUFFER_INITIAL_CAPACITY;
     // allocate memory for vector->data
-    buf->data = malloc(sizeof(int) * buf->capacity);
+    buf->data = malloc(sizeof(char) * buf->capacity);
 }
 
 void buffer_append(Buffer *buf, char* value, size_t nCount) {
